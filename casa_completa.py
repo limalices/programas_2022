@@ -45,14 +45,35 @@ class Mobilia(db.Model):
     nome = db.Column(db.String(254))
     funcao = db.Column(db.String(254))
     material = db.Column(db.String(254))
+    tipo = db.Column(db.String(254)) # versão dia 04/04/2022
 
     quarto_id = db.Column(db.Integer, db.ForeignKey(Comodo.id), nullable = True)
+
+    # versão do dia 04/04/2022
+    __mapper_args__ = {
+        'polymorphic_identity': 'mobilia',
+        'polymorphic_on': tipo
+    }
 
     def __str__(self) -> str:
         s = f'Mobília: ({self.id}) {self.nome}, {self.funcao}, {self.material}'
         if self.comodo:
             s += f', no {str(self.comodo)}'
         return s
+
+# versão dia 04/04/2022
+class Televisao(Mobilia):
+    marca = db.Column(db.String(254))
+    resolucao = db.Column(db.String(254))
+
+    id_mobilia = db.Column(db.Integer, db.ForeignKey (Mobilia.id), primary_key = True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'televisao'
+    }
+
+    def __str__(self) -> str:
+        return super().__str__() + ", " + self.marca + ", " + self.resolucao
 
 if __name__ == "__main__":
     if os.path.exists(arquivobd): # se houver o arquivo...
@@ -99,6 +120,11 @@ if __name__ == "__main__":
 
     db.session.add(m1)
     db.session.add(m2)
+    db.session.commit()
+
+    # versão dia 04/04/2022
+    t1 = Televisao(nome = "televisão 1", material = "plástico", marca = "Samsung", resolucao = "55 polegadas")
+    db.session.add(t1)
     db.session.commit()
     
     # quartos da casa, com lista reversa
