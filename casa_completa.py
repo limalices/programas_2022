@@ -61,7 +61,6 @@ class Mobilia(db.Model):
             s += f', no {str(self.comodo)}'
         return s
 
-# versão dia 04/04/2022
 class Televisao(Mobilia):
     marca = db.Column(db.String(254))
     resolucao = db.Column(db.String(254))
@@ -74,6 +73,19 @@ class Televisao(Mobilia):
 
     def __str__(self) -> str:
         return super().__str__() + ", " + self.marca + ", " + self.resolucao
+
+# versão dia 07/04/2022
+class Geladeira(Mobilia):
+    marca = db.Column(db.String(254))
+
+    id_mobilia = db.Column(db.Integer, db.ForeignKey (Mobilia.id), primary_key = True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'geladeira'
+    }
+
+    def __str__(self) -> str:
+        return super().__str__() + ", " + self.marca
 
 if __name__ == "__main__":
     if os.path.exists(arquivobd): # se houver o arquivo...
@@ -122,9 +134,13 @@ if __name__ == "__main__":
     db.session.add(m2)
     db.session.commit()
 
-    # versão dia 04/04/2022
     t1 = Televisao(nome = "televisão 1", material = "plástico", marca = "Samsung", resolucao = "55 polegadas")
     db.session.add(t1)
+    db.session.commit()
+
+    # versão dia 07/04/2022
+    g1 = Geladeira(nome = "geladeira 1", material = "plástico", marca = "Brastemp")
+    db.session.add(g1)
     db.session.commit()
     
     # quartos da casa, com lista reversa
